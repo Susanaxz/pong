@@ -3,13 +3,17 @@ import pygame #inicializar la librería
 class Pong:
 
     def __init__(self) :
-        print("Construyendo un objeto de la clase pong")
         pygame.init()
         self.pantalla = pygame.display.set_mode((600, 300))  #crear la pantalla para el juego
 
     def bucle_principal(self): #creación del bucle principal para que el juego permanezca abierto para ir actualizandose.
-        print("Bucle pral")
-        while True: 
+        salir = False
+        while not salir: 
+            #creamos un evento para salir del bucle cuando le demos a salir en el display
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    salir = True
+                    
             #dibujo un rectangulo
             pygame.draw.rect(self.pantalla, (245,184,65), pygame.Rect(30,60,100,150))
             pygame.display.flip()  #borra la pantalla y el bucle la vuelve a pintar
