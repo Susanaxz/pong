@@ -4,12 +4,40 @@ ANCHO = 640
 ALTO = 480
 COLOR = (245,184,65)
 
+ANCHO_PALETA = 10
+ALTO_PALETA = 40
+MARGEN_LATERAL = 40
+
+TAM_PELOTA = 5
+
+class Jugador(pygame.Rect):
+    def __init__(self, pos_x, pos_y):
+        self.rectangulo = pygame.Rect(pos_x, pos_y, ANCHO_PALETA, ALTO_PALETA)
+    
+    def pintame(self, pantalla):
+        pygame.draw.rect(pantalla, COLOR, self.rectangulo)
+
+
+class Pelota(pygame.Rect):
+    def __init__(self, x, y):
+        self.rectangulo = pygame.Rect(x, y, TAM_PELOTA, TAM_PELOTA)
+        
+    def pintame(self, pantalla):
+        pygame.draw.rect(pantalla, COLOR, self.rectangulo)
 
 class Pong:
 
-    def __init__(self) :
+    def __init__(self):
         pygame.init()
         self.pantalla = pygame.display.set_mode((ANCHO, ALTO))  #crear la pantalla para el juego
+        pos_y = (ALTO-ALTO_PALETA)/2
+        pos_x_2 = ANCHO-MARGEN_LATERAL-ANCHO_PALETA
+        
+        self.jugador1 = Jugador(MARGEN_LATERAL, pos_y)
+        self.jugador2 = Jugador(pos_x_2, pos_y)
+        pelota_x = (ANCHO - TAM_PELOTA)/2
+        pelota_y = (ALTO - TAM_PELOTA)/2
+        self.pelota = Pelota(pelota_x, pelota_y)
 
     def bucle_principal(self): #creación del bucle principal para que el juego permanezca abierto para ir actualizandose.
         salir = False
@@ -19,8 +47,13 @@ class Pong:
                 if evento.type == pygame.QUIT:
                     salir = True
 
-            #dibujo un rectangulo
-            pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(30,60,100,150))
+            #dibujo un rectangulo (x, y, ancho, alto)
+            self.jugador1.pintame(self.pantalla)
+            self.jugador2.pintame(self.pantalla)
+            self.pelota.pintame(self.pantalla)
+            
+            # pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(MARGEN_LATERAL, (ALTO-ALTO_PALETA)/2, ANCHO_PALETA, ALTO_PALETA))
+            # pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(ANCHO-MARGEN_LATERAL-ANCHO_PALETA, (ALTO-ALTO_PALETA)/2, ANCHO_PALETA, ALTO_PALETA))
             pygame.display.flip()  #borra la pantalla y el bucle la vuelve a pintar
 
 if __name__ == "__main__":
