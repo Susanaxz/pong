@@ -32,21 +32,18 @@ class Pelota(pygame.Rect):
 
 class Pong:
     def __init__(self):
+        
         pygame.init()
         # Crear la Pantalla para el juego
         self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
-        self.pantalla.fill(COLOR_PANTALLA)
         # importar una imagen de fondo
-        fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
-        self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla
-        # visualizar
+        
         pos_y = (ALTO - ALTO_PALETA) / 2
         pos_x_2 = ANCHO - MARGEN_LATERAL - ANCHO_PALETA
         self.jugador1 = Jugador(MARGEN_LATERAL, pos_y)
         self.jugador2 = Jugador(pos_x_2, pos_y)
         pelota_x = (ANCHO - TAM_PELOTA) / 2
         pelota_y = (ALTO - TAM_PELOTA) / 2
-        linea_x = (ANCHO - TAM_LINEA) / 2
         
         self.pelota = Pelota(pelota_x, pelota_y)
         
@@ -61,9 +58,24 @@ class Pong:
                 if evento.type == pygame.KEYUP:
                     if evento.key == pygame.K_ESCAPE:
                         salir = True
-                        
+                    # evento capturamos teclas de movimiento
+                    elif evento.key == pygame.K_a:
+                        print("Jugador 1 - Arriba")
+                    elif evento.key == pygame.K_z:
+                        print("Jugador 1 - Abajo")    
+                    elif evento.key == pygame.K_UP:
+                        print("Jugador 2 - Arriba")
+                    elif evento.key == pygame.K_DOWN:
+                        print("Jugador 2 - Abajo")    
+                                    
+            self.pantalla.fill(COLOR_PANTALLA)
+            
+            fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
+            self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla 
+            
             # pintar la red cada vez que se borre la pantalla           
-            self.pinta_red()
+            # self.pinta_red()
+            
             # dibujo un rectangulo (x, y, ancho, alto)
             self.jugador1.pintame(self.pantalla)
             self.jugador2.pintame(self.pantalla)
@@ -71,8 +83,7 @@ class Pong:
             
            
             self.pelota.pintame(self.pantalla)
-            # pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(MARGEN_LATERAL, (ALTO-ALTO_PALETA)/2, ANCHO_PALETA, ALTO_PALETA))
-            # pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(ANCHO-MARGEN_LATERAL-ANCHO_PALETA, (ALTO-ALTO_PALETA)/2, ANCHO_PALETA, ALTO_PALETA))
+            
             pygame.display.flip()  # borra la pantalla y el bucle la vuelve a pintar.
 
     def pinta_red(self):
