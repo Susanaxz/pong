@@ -2,6 +2,7 @@ import pygame
 
 ANCHO = 800
 ALTO = 600
+FPS = 120
 COLOR = (245, 184, 65)
 COLOR_PANTALLA = (86, 110, 61)
 
@@ -18,7 +19,7 @@ class Jugador(pygame.Rect):
     
     ARRIBA = True
     ABAJO = False
-    VELOCIDAD = 30
+    VELOCIDAD = 5
     
     def __init__(self, pos_x, pos_y):
         super().__init__(pos_x, pos_y, ANCHO_PALETA, ALTO_PALETA) #si tengo una herencia tenemos que llamar al constructor del padre. 
@@ -51,9 +52,8 @@ class Pong:
     def __init__(self):
         
         pygame.init()
-        # Crear la Pantalla para el juego
-        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
-        # importar una imagen de fondo
+        self.pantalla = pygame.display.set_mode((ANCHO, ALTO)) # Crear la Pantalla para el juego
+        self.reloj = pygame.time.Clock()
         
         pos_y = (ALTO - ALTO_PALETA) / 2
         pos_x_2 = ANCHO - MARGEN_LATERAL - ANCHO_PALETA
@@ -75,23 +75,29 @@ class Pong:
                 if evento.type == pygame.KEYUP: #pygame.key.get_pressed
                     if evento.key == pygame.K_ESCAPE:
                         salir = True
-                    # evento capturamos teclas de movimiento
-                    elif evento.key == pygame.K_a:
-                        self.jugador1.muevete(Jugador.ARRIBA)
                         
-                    elif evento.key == pygame.K_z:
-                        self.jugador1.muevete(Jugador.ABAJO)
+            estado_teclas = pygame.key.get_pressed()
+                    
+            # evento capturamos teclas de movimiento
+            if estado_teclas[pygame.K_a]:
+                self.jugador1.muevete(Jugador.ARRIBA)
+                
+            if estado_teclas[pygame.K_z]:
+                self.jugador1.muevete(Jugador.ABAJO)
 
-                    elif evento.key == pygame.K_UP:
-                        self.jugador2.muevete(Jugador.ARRIBA)
-                        
-                    elif evento.key == pygame.K_DOWN:
-                        self.jugador2.muevete(Jugador.ABAJO) 
+            if estado_teclas[pygame.K_UP]:
+                self.jugador2.muevete(Jugador.ARRIBA)
+                
+            if estado_teclas [pygame.K_DOWN]:
+                self.jugador2.muevete(Jugador.ABAJO) 
                                     
             self.pantalla.fill(COLOR_PANTALLA)
             
             fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
             self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla 
+            
+            self.reloj.tick(FPS)
+            
             
             # pintar la red cada vez que se borre la pantalla           
             # self.pinta_red()
