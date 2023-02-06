@@ -8,8 +8,9 @@ COLOR_PANTALLA = (86, 110, 61)
 ANCHO_PALETA = 10
 ALTO_PALETA = 40
 MARGEN_LATERAL = 40
+MARGEN = 40
 
-TAM_PELOTA = 8
+TAM_PELOTA = 10
 TAM_LINEA = 5
 
 
@@ -37,7 +38,7 @@ class Pong:
         self.pantalla.fill(COLOR_PANTALLA)
         # importar una imagen de fondo
         fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
-        self.pantalla.blit(fondo, (-1, 0))  # posición de la imagen en pantalla
+        self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla
         # visualizar
         pos_y = (ALTO - ALTO_PALETA) / 2
         pos_x_2 = ANCHO - MARGEN_LATERAL - ANCHO_PALETA
@@ -46,12 +47,10 @@ class Pong:
         pelota_x = (ANCHO - TAM_PELOTA) / 2
         pelota_y = (ALTO - TAM_PELOTA) / 2
         linea_x = (ANCHO - TAM_LINEA) / 2
+        
         self.pelota = Pelota(pelota_x, pelota_y)
-        # self.linea = pygame.draw.lines(self.pantalla, COLOR, True, [(linea_x, 0),(linea_x,ALTO)], TAM_LINEA)
-
-    def bucle_principal(
-        self,
-    ):  # bucle principal para que el juego permanezca abierto para ir actualizándose.
+        
+    def bucle_principal(self):  # bucle principal para que el juego permanezca abierto para ir actualizándose.
         salir = False
         while not salir:
             # creamos un evento para salir del bucle cuando le demos a salir en el display
@@ -60,16 +59,27 @@ class Pong:
                     salir = True
                     # salir con la tecla escape
                 if evento.type == pygame.KEYUP:
-                    if evento.tecla == pygame.K_ESCAPE:
+                    if evento.key == pygame.K_ESCAPE:
                         salir = True
-
+                        
+            # pintar la red cada vez que se borre la pantalla           
+            self.pinta_red()
             # dibujo un rectangulo (x, y, ancho, alto)
             self.jugador1.pintame(self.pantalla)
             self.jugador2.pintame(self.pantalla)
+            
+            
+           
             self.pelota.pintame(self.pantalla)
             # pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(MARGEN_LATERAL, (ALTO-ALTO_PALETA)/2, ANCHO_PALETA, ALTO_PALETA))
             # pygame.draw.rect(self.pantalla, (COLOR), pygame.Rect(ANCHO-MARGEN_LATERAL-ANCHO_PALETA, (ALTO-ALTO_PALETA)/2, ANCHO_PALETA, ALTO_PALETA))
             pygame.display.flip()  # borra la pantalla y el bucle la vuelve a pintar.
+
+    def pinta_red(self):
+        tramo_pintado = 15
+        tramo_vacio = 5
+        for i in range(MARGEN, ALTO-MARGEN, tramo_pintado+tramo_vacio):
+                pygame.draw.line(self.pantalla, COLOR, (ANCHO/2, i), (ANCHO/2, i+tramo_pintado), TAM_LINEA)
 
 
 if __name__ == "__main__":
