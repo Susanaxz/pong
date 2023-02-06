@@ -15,11 +15,28 @@ TAM_LINEA = 5
 
 
 class Jugador(pygame.Rect):
+    
+    ARRIBA = True
+    ABAJO = False
+    VELOCIDAD = 30
+    
     def __init__(self, pos_x, pos_y):
-        self.rectangulo = pygame.Rect(pos_x, pos_y, ANCHO_PALETA, ALTO_PALETA)
+        super().__init__(pos_x, pos_y, ANCHO_PALETA, ALTO_PALETA) #si tengo una herencia tenemos que llamar al constructor del padre. 
+        
 
     def pintame(self, pantalla):
-        pygame.draw.rect(pantalla, COLOR, self.rectangulo)
+        pygame.draw.rect(pantalla, COLOR, self) #pinto el rectángulo
+        
+    def muevete(self, direccion):
+        if direccion == self.ARRIBA:            
+            self.y = self.y - self.VELOCIDAD
+            if self.y < 0:
+                self.y = 0
+                
+        else:
+            self.y = self.y + self.VELOCIDAD
+            if self.y > ALTO-ALTO_PALETA:
+                self.y = ALTO-ALTO_PALETA
 
 
 class Pelota(pygame.Rect):
@@ -55,18 +72,21 @@ class Pong:
                 if evento.type == pygame.QUIT:
                     salir = True
                     # salir con la tecla escape
-                if evento.type == pygame.KEYUP:
+                if evento.type == pygame.KEYUP: #pygame.key.get_pressed
                     if evento.key == pygame.K_ESCAPE:
                         salir = True
                     # evento capturamos teclas de movimiento
                     elif evento.key == pygame.K_a:
-                        print("Jugador 1 - Arriba")
+                        self.jugador1.muevete(Jugador.ARRIBA)
+                        
                     elif evento.key == pygame.K_z:
-                        print("Jugador 1 - Abajo")    
+                        self.jugador1.muevete(Jugador.ABAJO)
+
                     elif evento.key == pygame.K_UP:
-                        print("Jugador 2 - Arriba")
+                        self.jugador2.muevete(Jugador.ARRIBA)
+                        
                     elif evento.key == pygame.K_DOWN:
-                        print("Jugador 2 - Abajo")    
+                        self.jugador2.muevete(Jugador.ABAJO) 
                                     
             self.pantalla.fill(COLOR_PANTALLA)
             
