@@ -98,7 +98,7 @@ class Pong:
                 if evento.type == pygame.QUIT:
                     salir = True
                     # salir con la tecla escape
-                if evento.type == pygame.KEYUP:  # pygame.key.get_pressed
+                if evento.type == pygame.KEYDOWN:  # pygame.key.get_pressed
                     if evento.key == pygame.K_ESCAPE:
                         salir = True
 
