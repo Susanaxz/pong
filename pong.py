@@ -6,6 +6,9 @@ ALTO = 600
 FPS = 40
 COLOR = (245, 184, 65)
 COLOR_PANTALLA = (86, 110, 61)
+COLOR_BLCO = (255, 255, 255)
+COLOR_NEGRO= (0, 0, 0)
+
 
 ANCHO_PALETA = 10
 ALTO_PALETA = 40
@@ -17,7 +20,6 @@ TAM_LINEA = 5
 
 
 class Jugador(pygame.Rect):
-
     ARRIBA = True
     ABAJO = False
     VELOCIDAD = 5
@@ -43,8 +45,7 @@ class Jugador(pygame.Rect):
 
 
 class Pelota(pygame.Rect):
-
-    velocidad_x = randint(-5, 5) #creamos la velocidad de la pelota de forma aleatoria
+    velocidad_x = randint(-5, 5)  # creamos la velocidad de la pelota de forma aleatoria
     velocidad_y = randint(-5, 5)
 
     def __init__(self, x, y):
@@ -58,21 +59,21 @@ class Pelota(pygame.Rect):
     def mover(self):
         self.x = self.x + self.velocidad_x
         self.y = self.y - self.velocidad_y
-        #rebote de la pelota
-        if self.y <=0:
+        # rebote de la pelota
+        if self.y <= 0:
             self.y = 0
             self.velocidad_y = -self.velocidad_y
         if self.y >= ALTO - TAM_PELOTA:
             self.y = ALTO - TAM_PELOTA
             self.velocidad_y = -self.velocidad_y
-     
+
     def colisionar(self, jugador):
         if self.colliderect(jugador):
             self.velocidad_x = -self.velocidad_x
 
+
 class Pong:
     def __init__(self):
-
         pygame.init()
         self.pantalla = pygame.display.set_mode(
             (ANCHO, ALTO)
@@ -92,7 +93,10 @@ class Pong:
         self,
     ):  # bucle principal para que el juego permanezca abierto para ir actualizándose.
         salir = False
+        empezar = False
+                
         while not salir:
+            
             # creamos un evento para salir del bucle cuando le demos a salir en el display
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
@@ -101,10 +105,18 @@ class Pong:
                 if evento.type == pygame.KEYDOWN:  # pygame.key.get_pressed
                     if evento.key == pygame.K_ESCAPE:
                         salir = True
+                        
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_SPACE:
+                        empezar = True
+                        
 
             estado_teclas = pygame.key.get_pressed()
 
             # evento capturamos teclas de movimiento
+            if estado_teclas[pygame.K_SPACE]:
+                self.pelota.mover()
+
             if estado_teclas[pygame.K_a]:
                 self.jugador1.muevete(Jugador.ARRIBA)
 
@@ -121,8 +133,17 @@ class Pong:
 
             fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
             self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla
-            self.pelota.mover()
-            
+
+            if not empezar:
+                    tipo = pygame.font.SysFont('Consolas', 30)
+                    texto = tipo.render("Pulsa la tecla espacio para empezar", True, COLOR, COLOR_NEGRO)
+                    texto_rect = texto.get_rect()
+                    texto_rect.center = (ANCHO //2, ALTO //3)
+                    self.pantalla.blit(texto, texto_rect)
+                    
+            if empezar == True:
+                self.pelota.mover()
+
             self.pelota.colisionar(self.jugador1)
             self.pelota.colisionar(self.jugador2)
 
