@@ -7,12 +7,12 @@ FPS = 40
 COLOR = (245, 184, 65)
 COLOR_PANTALLA = (86, 110, 61)
 COLOR_BLCO = (255, 255, 255)
-COLOR_NEGRO= (0, 0, 0)
+COLOR_K = (0, 0, 0)
 
 
 ANCHO_PALETA = 10
-ALTO_PALETA = 40
-MARGEN_LATERAL = 40
+ALTO_PALETA = 60
+MARGEN_LATERAL = 60
 MARGEN = 40
 
 TAM_PELOTA = 10
@@ -94,28 +94,26 @@ class Pong:
     ):  # bucle principal para que el juego permanezca abierto para ir actualizándose.
         salir = False
         empezar = False
-                
+
         while not salir:
-            
             # creamos un evento para salir del bucle cuando le demos a salir en el display
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     salir = True
+
                     # salir con la tecla escape
                 if evento.type == pygame.KEYDOWN:  # pygame.key.get_pressed
                     if evento.key == pygame.K_ESCAPE:
                         salir = True
-                        
+
+                    # empezar con la tecla espacio
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_SPACE:
                         empezar = True
-                        
 
             estado_teclas = pygame.key.get_pressed()
 
             # evento capturamos teclas de movimiento
-            if estado_teclas[pygame.K_SPACE]:
-                self.pelota.mover()
 
             if estado_teclas[pygame.K_a]:
                 self.jugador1.muevete(Jugador.ARRIBA)
@@ -134,15 +132,17 @@ class Pong:
             fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
             self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla
 
+            ######### EMPEZAR TOCANDO LA TECLA ESPACIO ##########
             if not empezar:
-                    tipo = pygame.font.SysFont('Consolas', 30)
-                    texto = tipo.render("Pulsa la tecla espacio para empezar", True, COLOR, COLOR_NEGRO)
-                    texto_rect = texto.get_rect()
-                    texto_rect.center = (ANCHO //2, ALTO //3)
-                    self.pantalla.blit(texto, texto_rect)
-                    
+                tipografia = pygame.font.Font("font/VT323-Regular.ttf", 40, bold=True)
+                texto_intro = tipografia.render(
+                    "Pulsa la tecla espacio para empezar", True, COLOR, COLOR_K
+                )
+                self.pantalla.blit(texto_intro, [120, 200])
+
             if empezar == True:
                 self.pelota.mover()
+            ######################################################
 
             self.pelota.colisionar(self.jugador1)
             self.pelota.colisionar(self.jugador2)
