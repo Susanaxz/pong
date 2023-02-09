@@ -17,6 +17,7 @@ MARGEN = 40
 
 TAM_PELOTA = 10
 TAM_LINEA = 5
+VEL_MAX_PELOTA = 5
 
 
 class Jugador(pygame.Rect):
@@ -45,13 +46,15 @@ class Jugador(pygame.Rect):
 
 
 class Pelota(pygame.Rect):
-    velocidad_x = randint(-5, 5)  # creamos la velocidad de la pelota de forma aleatoria
-    velocidad_y = randint(-5, 5)
-
     def __init__(self, x, y):
         super(Pelota, self).__init__(
             x, y, TAM_PELOTA, TAM_PELOTA
         )  # metodo constructor del método que heredo
+        # creamos la velocidad de la pelota de forma aleatoria
+        self.velocidad_y = randint(-VEL_MAX_PELOTA, VEL_MAX_PELOTA)
+        self.velocidad_x = 0
+        while self.velocidad_x == 0:
+            self.velocidad_x = randint(-VEL_MAX_PELOTA, VEL_MAX_PELOTA)
 
     def pintame(self, pantalla):
         pygame.draw.rect(pantalla, COLOR, self)
@@ -71,6 +74,41 @@ class Pelota(pygame.Rect):
         if self.colliderect(jugador):
             self.velocidad_x = -self.velocidad_x
 
+    def comprobar_punto(self):
+        resultado = 0
+        if self.x < 0:
+            self.x = (ANCHO - TAM_PELOTA) / 2
+            self.y = (ANCHO - TAM_PELOTA) / 2
+            self.velocidad_y = randint(-VEL_MAX_PELOTA, VEL_MAX_PELOTA)
+            self.velocidad_x = randint(-VEL_MAX_PELOTA, -1)
+            print("punto para jug 2")
+            resultado = 2
+
+        if self.x > ANCHO:
+            self.x = (ANCHO - TAM_PELOTA) / 2
+            self.y = (ANCHO - TAM_PELOTA) / 2
+            self.velocidad_y = randint(-VEL_MAX_PELOTA, VEL_MAX_PELOTA)
+            self.velocidad_x = randint(1, VEL_MAX_PELOTA)
+            print("punto para jug 1")
+            resultado = 1
+        return resultado
+
+
+class Marcador:
+    def __init__(self):
+        self.puntuacion = [0, 0]
+        self.mostrar()
+
+    def reset(self):
+        self.puntuacion = [0, 0]
+
+    def sumar_punto(self, jugador):
+        self.puntuacion[jugador-1] += 1
+        
+    def mostrar(self):
+        print(f"El marcador ahora es: ({self.puntuacion[0]}, {self.puntuacion[1]})")
+        
+
 
 class Pong:
     def __init__(self):
@@ -78,7 +116,11 @@ class Pong:
         self.pantalla = pygame.display.set_mode(
             (ANCHO, ALTO)
         )  # Crear la Pantalla para el juego
-        self.reloj = pygame.time.Clock()
+        pygame.display.set_caption("SU Pong")
+
+        self.reloj = (
+            pygame.time.Clock()
+        )  # Crea un nuevo objeto Reloj que es usado para rastrear una cantidad de tiempo
 
         pos_y = (ALTO - ALTO_PALETA) / 2
         pos_x_2 = ANCHO - MARGEN_LATERAL - ANCHO_PALETA
@@ -88,6 +130,7 @@ class Pong:
         pelota_y = (ALTO - TAM_PELOTA) / 2
 
         self.pelota = Pelota(pelota_x, pelota_y)
+        self.marcador = Marcador()
 
     def bucle_principal(
         self,
@@ -157,7 +200,12 @@ class Pong:
             self.jugador2.pintame(self.pantalla)
 
             self.pelota.pintame(self.pantalla)
-
+            
+            jugador_que_puntua = self.pelota.comprobar_punto()
+            
+            if jugador_que_puntua> 0:
+                self.marcador.sumar_punto(jugador_que_puntua)
+            
             pygame.display.flip()  # borra la pantalla y el bucle la vuelve a pintar.
 
     def pinta_red(self):
