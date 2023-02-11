@@ -3,11 +3,12 @@ from random import randint
 
 ANCHO = 800
 ALTO = 600
-FPS = 40
+FPS = 60
 COLOR = (245, 184, 65)
 COLOR_PANTALLA = (86, 110, 61)
 COLOR_BLCO = (255, 255, 255)
 COLOR_K = (0, 0, 0)
+PUNTOS_PARTIDA = 3
 
 
 ANCHO_PALETA = 10
@@ -96,7 +97,7 @@ class Pelota(pygame.Rect):
 
 class Marcador:
     def __init__(self):
-        self.puntuacion = [0, 0]
+        self.reset()
         self.mostrar()
 
     def reset(self):
@@ -104,11 +105,22 @@ class Marcador:
 
     def sumar_punto(self, jugador):
         self.puntuacion[jugador-1] += 1
+        self.mostrar()
         
     def mostrar(self):
         print(f"El marcador ahora es: ({self.puntuacion[0]}, {self.puntuacion[1]})")
         
-
+    def comprobar_ganador(self):
+        hay_ganador = False
+        if self.puntuacion[0] == PUNTOS_PARTIDA:
+            print("Gana el jugador 1")
+            self.reset()
+            hay_ganador = True
+        if self.puntuacion[1]  == PUNTOS_PARTIDA:
+            print("gana el jugador 2")   
+            self.reset()        
+            hay_ganador = True
+        return hay_ganador
 
 class Pong:
     def __init__(self):
@@ -205,6 +217,9 @@ class Pong:
             
             if jugador_que_puntua> 0:
                 self.marcador.sumar_punto(jugador_que_puntua)
+            
+            salir = self.marcador.comprobar_ganador()
+                
             
             pygame.display.flip()  # borra la pantalla y el bucle la vuelve a pintar.
 
