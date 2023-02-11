@@ -8,7 +8,7 @@ COLOR = (245, 184, 65)
 COLOR_PANTALLA = (86, 110, 61)
 COLOR_BLCO = (255, 255, 255)
 COLOR_K = (0, 0, 0)
-PUNTOS_PARTIDA = 3
+PUNTOS_PARTIDA = 2
 
 
 ANCHO_PALETA = 10
@@ -96,31 +96,41 @@ class Pelota(pygame.Rect):
 
 
 class Marcador:
+    ganador = 0
+
     def __init__(self):
+        self.tipo_letra = pygame.font.Font("font/VT323-Regular.ttf", 40, bold=True)
         self.reset()
         self.mostrar()
 
     def reset(self):
         self.puntuacion = [0, 0]
+        self.ganador = 0
 
     def sumar_punto(self, jugador):
-        self.puntuacion[jugador-1] += 1
+        self.puntuacion[jugador - 1] += 1
         self.mostrar()
-        
+
+    def comprobar_ganador(self):
+        if self.puntuacion[0] == PUNTOS_PARTIDA:
+            self.reset()
+            self.ganador = 1
+
+        if self.puntuacion[1] == PUNTOS_PARTIDA:
+            self.reset()
+            self.ganador = 2
+        return self.ganador > 0
+
+    def pintar_ganador(self, pantalla):
+        txt = pygame.font.Font.render(
+            self.tipo_letra, "The winner is: PLAYER {self.ganador}", True, COLOR_K
+        )
+        pos_marcador_x = ANCHO / 2 - txt.get_width() / 2
+        pos_marcador_y = ALTO / 2 - txt.get_height() / 2
+        pygame.Surface.blit(pantalla, txt, [pos_marcador_x, pos_marcador_y])
+
     def mostrar(self):
         print(f"El marcador ahora es: ({self.puntuacion[0]}, {self.puntuacion[1]})")
-        
-    def comprobar_ganador(self):
-        hay_ganador = False
-        if self.puntuacion[0] == PUNTOS_PARTIDA:
-            print("Gana el jugador 1")
-            self.reset()
-            hay_ganador = True
-        if self.puntuacion[1]  == PUNTOS_PARTIDA:
-            print("gana el jugador 2")   
-            self.reset()        
-            hay_ganador = True
-        return hay_ganador
 
 class Pong:
     def __init__(self):
@@ -129,6 +139,10 @@ class Pong:
             (ANCHO, ALTO)
         )  # Crear la Pantalla para el juego
         pygame.display.set_caption("SU Pong")
+
+        self.fondo = pygame.image.load(
+            "img/campo.png"
+        ).convert_alpha()  # IMPORTAR IMAGEN DE FONDO
 
         self.reloj = (
             pygame.time.Clock()
@@ -142,7 +156,10 @@ class Pong:
         pelota_y = (ALTO - TAM_PELOTA) / 2
 
         self.pelota = Pelota(pelota_x, pelota_y)
+
         self.marcador = Marcador()
+
+        pygame.font.init()
 
     def bucle_principal(
         self,
@@ -182,10 +199,8 @@ class Pong:
             if estado_teclas[pygame.K_DOWN]:
                 self.jugador2.muevete(Jugador.ABAJO)
 
-            self.pantalla.fill(COLOR_PANTALLA)
-
-            fondo = pygame.image.load("img/campo.png").convert_alpha()  # importar
-            self.pantalla.blit(fondo, (0, 0))  # posición de la imagen en pantalla
+            self.pantalla.blit(self.fondo, (0, 0))  # pintar el FONDO DEL CAMPO
+            # self.pantalla.fill(COLOR_PANTALLA) -- PONER UN COLOR DE BACKGROUND
 
             ######### EMPEZAR TOCANDO LA TECLA ESPACIO ##########
             if not empezar:
@@ -198,6 +213,13 @@ class Pong:
             if empezar == True:
                 self.pelota.mover()
             ######################################################
+
+            ##### DIBUJO MARCADOR #####
+
+            # self.txt = pygame.font.Font.render(self.tipo_letra, "hola", True, COLOR_K)
+            # pos_marcador_x = ANCHO/2 - self.txt.get_width()/2
+            # pos_marcador_y = ALTO/2 - self.txt.get_height()/2
+            # self.pantalla.blit(self.txt, [pos_marcador_x, pos_marcador_y])
 
             self.pelota.colisionar(self.jugador1)
             self.pelota.colisionar(self.jugador2)
@@ -212,15 +234,16 @@ class Pong:
             self.jugador2.pintame(self.pantalla)
 
             self.pelota.pintame(self.pantalla)
-            
+
             jugador_que_puntua = self.pelota.comprobar_punto()
-            
-            if jugador_que_puntua> 0:
+
+            if jugador_que_puntua > 0:
                 self.marcador.sumar_punto(jugador_que_puntua)
-            
-            salir = self.marcador.comprobar_ganador()
-                
-            
+
+            if self.marcador.comprobar_ganador():
+                self.marcador.pintar_ganador(self.pantalla)
+                salir = True
+
             pygame.display.flip()  # borra la pantalla y el bucle la vuelve a pintar.
 
     def pinta_red(self):
