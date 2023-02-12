@@ -8,7 +8,7 @@ COLOR = (245, 184, 65)
 COLOR_PANTALLA = (86, 110, 61)
 COLOR_BLCO = (255, 255, 255)
 COLOR_K = (0, 0, 0)
-PUNTOS_PARTIDA = 2
+PUNTOS_PARTIDA = 4
 
 
 ANCHO_PALETA = 10
@@ -94,6 +94,10 @@ class Pelota(pygame.Rect):
             resultado = 1
         return resultado
 
+    def reset(self):
+        self.x = (ANCHO - TAM_PELOTA) / 2
+        self.y = (ALTO - TAM_PELOTA) / 2
+
 
 class Marcador:
     ganador = 0
@@ -123,19 +127,14 @@ class Marcador:
 
     def pintar_ganador(self, pantalla):
         msg = f"The winner is: PLAYER {self.ganador}"
-        txt = pygame.font.Font.render(
-            self.tipo_letra, msg, True, COLOR_K
-        )
+        txt = pygame.font.Font.render(self.tipo_letra, msg, True, COLOR_K)
         pos_marcador_x = ANCHO / 2 - txt.get_width() / 2
         pos_marcador_y = ALTO / 2 - txt.get_height() / 2
         pygame.Surface.blit(pantalla, txt, [pos_marcador_x, pos_marcador_y])
 
     def mostrar(self):
-        # jug1 = f"Player 1: {self.puntuacion[0]}"
-        # jug2 = f"Player 2: {self.puntuacion[1]}"
-        # pygame.Surface.blit(pantalla, jug1, [100, 100])
-        # pygame.Surface.blit(pantalla, jug2, [200, 100])
         print(f"El marcador ahora es: ({self.puntuacion[0]}, {self.puntuacion[1]})")
+
 
 class Pong:
     def __init__(self):
@@ -153,14 +152,15 @@ class Pong:
             pygame.time.Clock()
         )  # Crea un nuevo objeto Reloj que es usado para rastrear una cantidad de tiempo
 
+        ##### CREAMOS LOS OBJETOS DEL JUEGO #####
         pos_y = (ALTO - ALTO_PALETA) / 2
         pos_x_2 = ANCHO - MARGEN_LATERAL - ANCHO_PALETA
         self.jugador1 = Jugador(MARGEN_LATERAL, pos_y)
         self.jugador2 = Jugador(pos_x_2, pos_y)
-        pelota_x = (ANCHO - TAM_PELOTA) / 2
-        pelota_y = (ALTO - TAM_PELOTA) / 2
+        self.pelota_x = (ANCHO - TAM_PELOTA) / 2
+        self.pelota_y = (ALTO - TAM_PELOTA) / 2
 
-        self.pelota = Pelota(pelota_x, pelota_y)
+        self.pelota = Pelota(self.pelota_x, self.pelota_y)
 
         self.marcador = Marcador()
 
@@ -173,6 +173,7 @@ class Pong:
         empezar = False
 
         while not salir:
+            self.volver = False
             # creamos un evento para salir del bucle cuando le demos a salir en el display
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
@@ -187,6 +188,12 @@ class Pong:
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_SPACE:
                         empezar = True
+
+                    # volver a jugar con la tecla r
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_r:
+                        self.marcador.reset()
+                        empezar = False
 
             estado_teclas = pygame.key.get_pressed()
 
@@ -224,9 +231,9 @@ class Pong:
             self.puntos = tipo.render(
                 f"{self.marcador.puntuacion[0]} - {self.marcador.puntuacion[1]}",
                 False,
-                COLOR_K
+                COLOR_K,
             )
-            pos_marcador_x = ANCHO/2 - self.puntos.get_width()/2
+            pos_marcador_x = ANCHO / 2 - self.puntos.get_width() / 2
             pos_marcador_y = 20
             self.pantalla.blit(self.puntos, [pos_marcador_x, pos_marcador_y])
             ##############################
@@ -250,9 +257,23 @@ class Pong:
             if jugador_que_puntua > 0:
                 self.marcador.sumar_punto(jugador_que_puntua)
 
+            ############# PINTAR GANADOR #############
             if self.marcador.comprobar_ganador():
                 self.marcador.pintar_ganador(self.pantalla)
-                salir = True
+
+            ##### REINICIAR EL JUEGO CON LA TECLA R #####
+            if self.marcador.comprobar_ganador():
+                tipografia = pygame.font.Font("font/VT323-Regular.ttf", 40, bold=True)
+                txt = tipografia.render(
+                    "Pulsa la tecla R para reiniciar", True, COLOR, COLOR_K
+                )
+                pos_txt_x = ANCHO / 2 - txt.get_width() / 2
+
+                self.pantalla.blit(txt, [pos_txt_x, 200])
+
+                self.pelota.reset()
+
+                # salir = True
 
             pygame.display.flip()  # borra la pantalla y el bucle la vuelve a pintar.
 
