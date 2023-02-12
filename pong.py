@@ -122,14 +122,19 @@ class Marcador:
         return self.ganador > 0
 
     def pintar_ganador(self, pantalla):
+        msg = f"The winner is: PLAYER {self.ganador}"
         txt = pygame.font.Font.render(
-            self.tipo_letra, "The winner is: PLAYER {self.ganador}", True, COLOR_K
+            self.tipo_letra, msg, True, COLOR_K
         )
         pos_marcador_x = ANCHO / 2 - txt.get_width() / 2
         pos_marcador_y = ALTO / 2 - txt.get_height() / 2
         pygame.Surface.blit(pantalla, txt, [pos_marcador_x, pos_marcador_y])
 
     def mostrar(self):
+        # jug1 = f"Player 1: {self.puntuacion[0]}"
+        # jug2 = f"Player 2: {self.puntuacion[1]}"
+        # pygame.Surface.blit(pantalla, jug1, [100, 100])
+        # pygame.Surface.blit(pantalla, jug2, [200, 100])
         print(f"El marcador ahora es: ({self.puntuacion[0]}, {self.puntuacion[1]})")
 
 class Pong:
@@ -215,11 +220,16 @@ class Pong:
             ######################################################
 
             ##### DIBUJO MARCADOR #####
-
-            # self.txt = pygame.font.Font.render(self.tipo_letra, "hola", True, COLOR_K)
-            # pos_marcador_x = ANCHO/2 - self.txt.get_width()/2
-            # pos_marcador_y = ALTO/2 - self.txt.get_height()/2
-            # self.pantalla.blit(self.txt, [pos_marcador_x, pos_marcador_y])
+            tipo = pygame.font.Font("font/VT323-Regular.ttf", 200, bold=True)
+            self.puntos = tipo.render(
+                f"{self.marcador.puntuacion[0]} - {self.marcador.puntuacion[1]}",
+                False,
+                COLOR_K
+            )
+            pos_marcador_x = ANCHO/2 - self.puntos.get_width()/2
+            pos_marcador_y = 20
+            self.pantalla.blit(self.puntos, [pos_marcador_x, pos_marcador_y])
+            ##############################
 
             self.pelota.colisionar(self.jugador1)
             self.pelota.colisionar(self.jugador2)
